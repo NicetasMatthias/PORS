@@ -1,0 +1,51 @@
+import java.io.*;
+import java.net.*;
+//import java.util.*;
+
+public class Server {
+  public final static int PORT = 1099;
+  public static int i = 0;
+  public static void main(String[] args) throws IOException {
+      DatagramSocket serverSocket = new DatagramSocket(PORT);
+      try {
+          byte[] receivingDataBuffer = new byte[1024];
+          byte[] buffer = new byte[1024];
+          DatagramPacket inputPacket =
+                            new DatagramPacket(receivingDataBuffer,
+                            		receivingDataBuffer.length);
+          System.out.println("Waiting for a client to connect...");
+          FileOutputStream fo = new FileOutputStream("test_r.mp3",true);
+          //List <Byte> bl = new ArrayList<Byte>();
+          while(true) {
+        	  serverSocket.receive(inputPacket);
+        	  //String receivedData = new String(inputPacket.getData());
+        	  buffer = inputPacket.getData();
+        	  String receivedData = new String(buffer);
+        	  System.out.println("recieve");
+        	  if(receivedData.contains("END")) break;
+        	  
+        	  //for(int j=0; j < 1024; j++) bl.add(buffer[j]);
+        	  fo.write(buffer);
+        	  //fo.write(inputPacket.getData());
+        	  i++;
+        	  
+        	  for(int j=0; j < 1024; j++) receivingDataBuffer[j] = 0;
+          } 
+          //Byte Buff[] = new Byte[bl.size()];
+          //byte buff[] = new byte[bl.size()];
+          //Buff = bl.toArray(Buff);
+          //for (int i = 0; i < bl.size(); i++) buff[i] = Buff[i].byteValue();
+          //fo.write(buff);
+          fo.close();
+      } 
+      catch (SocketException e){
+    	  e.printStackTrace();
+      } finally {
+          FileOutputStream fl = new FileOutputStream("log.txt",true);
+          String l = "Recieved " +i + "KB";
+    	  fl.write(l.getBytes());
+    	  System.out.println("**Closing ...");
+    	  serverSocket.close();
+      }   
+  }
+}
